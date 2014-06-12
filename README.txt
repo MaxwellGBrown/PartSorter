@@ -33,6 +33,8 @@ Main.py
 Operates the Reporter from Report.py so that the SampleData.csv is read and writes to
 SampleOutput.csv.
 
+Uses a very simple Tkinter command to open a "File open" dialogue.
+
 CheckAndFilter.py
 -----------------
 Contains checkFunction(part) and filterFunction(part) which can both be used to override
