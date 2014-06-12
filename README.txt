@@ -23,10 +23,15 @@ PartFactory.py
 Responsible for the compiling of lists of parts into part hierarchies.
 Modeled with the factory pattern.
 
+Report.py
+---------
+Provides a director interface for PartFactory() so that PartFactory can be built with 
+CSV files and write to CSV files.
+
 Main.py
 ---------
-Executes the other pieces of the package, including reading a file, building the parts 
-through the partfactory, and writing to a new CSV file.
+Operates the Reporter from Report.py so that the SampleData.csv is read and writes to
+SampleOutput.csv.
 
 CheckAndFilter.py
 -----------------
@@ -43,30 +48,19 @@ Just resave as CheckAndFilter.py to replace the current one.
 Future development:
 ===============
 
-1. Decouple writing files from PartFactory
-__________________________________________
+1. Clean up PartFactory.py
+___________________________
 
-Report.py
----------
-A file that will decouple Parts.py and PartFactory.py away from the CSV format. This isn't
-imperative because both Parts and PartFactory operate very well even with the CSV modules
-they have, but decoupling them can allow for deviation from the CSV file format.
+PartFactory() currently exists as an object that holds the pieces that it's assembled.
+This doesn't cater to my ideal outfitting of FactoryPattern which should just be used to
+"assemble" parts and subcomps into one low-level part. 
 
+Whether or not the current implementation is a direction that is suitable for future 
+developments remains to be seen, but the current implementation is still suspect.
 
-2. Make PartFactory a pure factory pattern
-__________________________________________
+2. Add real Error Checking in reading CSV
+_________________________________________
 
-At the moment, Part Factory isn't a pure factory pattern; the way PartFactory builds is
-done by compiling one large list instead of being commanded by a higher-up function.
-
-To do this, reading files and populating the factory has to be decoupled from the 
-PartFactory object. To do this, a module for "addpart" and "construct parts" should be 
-added so that as the high-level function gets the parts it adds them into an "unconstructed
-stack" and then when necessary runs the "construct parts" function to consolidate 
-subcomponents. 
-
-Doing this will allow for different algorithms for reading different kinds of files to be
-implemented. The CSV modules for PartFactory don't hurt it's functionality, so it's not
-absolutely necessary in the case that PartFactory is used as a module in something else,
-but it would make me happy.
-
+Current implementation has only checks for short or nonexistant line entries. Implementing
+a module for error checking would make current and future error checking much easier and
+more customizable.

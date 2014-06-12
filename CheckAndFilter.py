@@ -1,4 +1,4 @@
-'''Functions to be used with PartFactory.writeCSVtoFile'''
+'''Functions to be used with Reporter class in outputting CSV files.'''
 
 from Parts import Part
 

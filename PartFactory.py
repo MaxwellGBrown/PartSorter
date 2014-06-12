@@ -1,13 +1,9 @@
 
-import Parts
-
 class PartFactory(object):
     def __init__(self):
-        '''Factory takes CSV from string or file and obstantiates parts'''
+        '''Builds parts & components from tokens. Holds unrelated parts.'''
         self._parts = []
-        
-    def __str__(self):
-        pass
+        self._assembly = [] # added parts stored here until self.AssembleParts()
     
     def __repr__(self):
         string = str()
@@ -24,95 +20,43 @@ class PartFactory(object):
         return self._parts[index]
 
     def __iter__(self):
-        '''Iterates recursively through all parts and subcomps'''
+        '''Iterates recursively through all parts and their subcomps'''
         for part in self._parts:
             yield part
             for sub_comp in part:
                 yield sub_comp
     
-    def getPart(self, index=int()):
-        '''Returns Part object at the given index of Factory._parts'''
-        return self._parts[index]
-    
-    def buildFromString(self, CSV_string):
-        '''Builds parts from a Comma Seperated Value string in the format
-           "level, assembly, part number \n"'''
-        # split text into lines
-        split_CSV_string = CSV_string.split('\n')
-        build_stack = []
-        # add all parts into build stack
-        for part in split_CSV_string:
-            # ERROR CHECKING
-            if part == ",,\n" or len(part) < 6:
-                continue
-            # END ERROR CHECKING
-            else:
-                # split lines into parts
-                split_part = part.split(',')
-                # create instance from string
-                new_part = Parts.Part(split_part[1], split_part[0],
-                                      split_part[2])
-                build_stack.append(new_part)
+    def pop(self, index=int()):
+        '''Returns & removes Part object at the given index of Factory._parts'''
+        return self._parts.pop(index)
 
-        # consolidate parts into subcomps of other parts
+    def addPart(self, part_number=str(), level=int(), assembly=str()):
+        '''From a token, adds a part to the assembly list to be constructed'''
+        from Parts import Part
+        new_part = Part(part_number, level, assembly)
+        self._assembly.append(new_part)
+
+    def assembleParts(self):
+        '''Assembles all parts in the assembly list.
+           Adds them to the completed factory'''
         finished = False
         while not finished:
-            # for every index in build_stack
-            old_build_stack_length = len(build_stack)
+            # for every index in self._assembly
+            old_assembly_length = len(self._assembly)
             # check if a consolidation can be made
-            for idx in range(len(build_stack)-1, -1, -1):
-                if build_stack[idx].getLevel() > build_stack[idx-1].getLevel():
-                    build_stack[idx-1].addSubComp(build_stack.pop(idx))
+            for idx in range(len(self._assembly)-1, -1, -1):
+                if self._assembly[idx].getLevel() > self._assembly[idx-1].getLevel():
+                    self._assembly[idx-1].addSubComp(self._assembly.pop(idx))
                     break
             # if no consolidations are made, then it's done!
-            if old_build_stack_length == len(build_stack):
+            if old_assembly_length == len(self._assembly):
                 finished = True
                 
-        # add all parts to the _parts list  
-        for part in build_stack:
-            self._parts.append(part)
-            
-    def buildFromFile(self, CSV_filename):
-        '''Builds parts from a CSV file in the format of
-           "level, assembly, part number\n" '''
-        CSV_file = open(CSV_filename, 'r')
-        CSV = CSV_file.read()
-        CSV_file.close()
-        self.buildFromString(CSV)
-        
-    def writeCSVtoFile(self, new_CSV_filename,
-             checkFunction=None, filterFunction=None):
-        '''Writes a PartFactory into a CSV file.
-           checkFunction returns True if an entry is to be included,
-           False if not.
-           filterFunction returns the CSV output to be written.
-           (can return empty string if not to be included?)
-           Both do nothing by default.'''
-        
-        # make default function for checkFunction
-        if checkFunction is None:
-            checkFunction = lambda part: True
-        # make default function for filterFunction
-        if filterFunction is None:
-            filterFunction = lambda part: part.CSV()
-
-        output_list = []
-        for part in self:
-            if checkFunction(part):
-                filtered_CSV_line = filterFunction(part)
-                if filtered_CSV_line == '':
-                    continue
-                else:
-                    output_list.append(filtered_CSV_line)
-
-        CSV_file = open(new_CSV_filename, 'w')
-        for filtered_output_line in output_list:
-            CSV_file.write(filtered_output_line)
-        CSV_file.close()
-
+        for idx in range(len(self._assembly)-1,-1,-1):
+            self._parts.append(self._assembly.pop(idx) )
                 
     def showAllParts(self):
-        '''Prints all parts in factory'''
+        '''Prints all parts in factory. Primary use for error checking'''
         for part in self._parts:
             # add a break for seperate parts
             if part.getLevel == 1:

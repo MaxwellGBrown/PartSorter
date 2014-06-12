@@ -1,11 +1,11 @@
 
-from PartFactory import PartFactory
-from Parts import Part
+from Report import Reporter
 from CheckAndFilter import *
 
-F = PartFactory()
-F.buildFromFile('SampleData.csv')
-F.writeCSVtoFile('SampleOutput.csv',checkFunction=checkFunction,
-                 filterFunction = filterFunction)
+R = Reporter()
+R.setCheckFunction(checkFunction)
+R.setFilterFunction(filterFunction)
+R.buildFromCSVfile('SampleData.csv')
+R.writeCSVtoFile('SampleOutput.csv')
 
 
